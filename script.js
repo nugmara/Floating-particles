@@ -8,7 +8,7 @@ gradient.addColorStop(0, "#90f1ef");
 gradient.addColorStop(0.5, "#ffd6e0");
 gradient.addColorStop(1, "#ffef9f");
 ctx.fillStyle = gradient;
-ctx.strokeStyle = "white"
+ctx.strokeStyle = "silver"
 
 class Particle {
     constructor(effect) {
@@ -141,7 +141,7 @@ class Effect {
         gradient.addColorStop(0, "#ffd6e0");
         gradient.addColorStop(0, "#ffef9f");
         this.context.fillStyle = gradient;
-        this.context.strokeStyle = "white";
+        this.context.strokeStyle = "silver";
         this.particles.forEach(particle => {
             particle.reset()
         })
