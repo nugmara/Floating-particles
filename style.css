@@ -6,9 +6,21 @@
 
 canvas {
     /* background: #fffafa; */
-    background: black;
+    background: linear-gradient(#2371ad, #f779de, #3e0787 );
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+#whale1 {
+    display: none;
+}
+
+#whale2 {
+    display: none;
+}
+
+#whale3 {
+    display: none;
 }

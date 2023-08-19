@@ -32,16 +32,16 @@ class Particle {
     context.fill();
   }
   update() {
-    if (this.effect.mouse.pressed) {
-      const dx = this.x - this.effect.mouse.x;
-      const dy = this.y - this.effect.mouse.y;
+    // if (this.effect.mouse.pressed) {
+      const dx = this.x - this.effect.whale.x;
+      const dy = this.y - this.effect.whale.y;
       const distance = Math.hypot(dx, dy);
-      const force = this.effect.mouse.radius / distance;
-      if (distance < this.effect.mouse.radius) {
+      const force = this.effect.whale.radius / distance;
+      if (distance < this.effect.whale.radius) {
         const angle = Math.atan2(dy, dx);
         this.pushX += Math.cos(angle) * force;
         this.pushY += Math.sin(angle) * force;
-      }
+    //   }
     }
     this.x += (this.pushX *= this.friction) + this.vx;
     this.y += this.pushY *= this.friction;
@@ -79,14 +79,18 @@ class Whale {
     this.effect = effect;
     this.x = this.effect.width * 0.4;
     this.y = this.effect.height * 0.5;
-    this.image = document.getElementById("whale2");
+    this.image = document.getElementById("whale3");
     this.angle = 0;
     this.va = 0.01;
     this.curve = this.effect.height * 0.2;
     this.spriteWidth = 420;
     this.spreiteHeight = 285;
     this.frameX = 0;
+    this.frameY = Math.floor(Math.random() * 4);
     this.maxFrame = 38;
+    this.frameTimer = 0;
+    this.frameInterval = 1000/60;
+    this.radius = 200;
   }
   draw(context) {
     context.save();
@@ -95,7 +99,7 @@ class Whale {
     context.drawImage(
       this.image,
       this.frameX * this.spriteWidth,
-      0,
+      this.frameY * this.spreiteHeight,
       this.spriteWidth,
       this.spreiteHeight,
       0 - this.spriteWidth * 0.5,
@@ -105,12 +109,19 @@ class Whale {
     );
     context.restore();
   }
-  update() {
+  update(deltaTime) {
     this.angle += this.va;
     this.y = this.effect.height * 0.5 + Math.sin(this.angle) * this.curve;
     if (this.angle > Math.PI * 2) this.angle = 0;
     // spirte animation
-    this.frameX < this.maxFrame ? this.frameX++ : this.frameX = 0;
+    // fps
+    if (this.frameTimer > this.frameInterval) {
+        // sprite animation
+        this.frameX < this.maxFrame ? this.frameX++ : this.frameX = 0;
+        this.frameTimer = 0;
+    } else {
+        this.frameTimer += deltaTime
+    }
   }
 }
 
@@ -126,39 +137,39 @@ class Effect {
     this.createParticles();
     this.whale = new Whale(this);
 
-    this.mouse = {
-      x: 0,
-      y: 0,
-      pressed: false,
-      radius: 200,
-    };
+    // this.mouse = {
+    //   x: 0,
+    //   y: 0,
+    //   pressed: false,
+    //   radius: 200,
+    // };
 
     window.addEventListener("resize", (e) => {
       this.resize(e.target.window.innerWidth, e.target.window.innerHeight);
     });
-    window.addEventListener("mousemove", (e) => {
-      if (this.mouse.pressed) {
-        this.mouse.x = e.x;
-        this.mouse.y = e.y;
-      }
-    });
-    window.addEventListener("mousedown", (e) => {
-      this.mouse.pressed = true;
-      this.mouse.x = e.x;
-      this.mouse.y = e.y;
-    });
-    window.addEventListener("mouseup", (e) => {
-      this.mouse.pressed = false;
-    });
+    // window.addEventListener("mousemove", (e) => {
+    //   if (this.mouse.pressed) {
+    //     this.mouse.x = e.x;
+    //     this.mouse.y = e.y;
+    //   }
+    // });
+    // window.addEventListener("mousedown", (e) => {
+    //   this.mouse.pressed = true;
+    //   this.mouse.x = e.x;
+    //   this.mouse.y = e.y;
+    // });
+    // window.addEventListener("mouseup", (e) => {
+    //   this.mouse.pressed = false;
+    // });
   }
   createParticles() {
     for (let i = 0; i < this.numberOfParticles; i++) {
       this.particles.push(new Particle(this));
     }
   }
-  handleParticles(context) {
+  handleParticles(context, deltaTime) {
     this.whale.draw(context);
-    this.whale.update();
+    this.whale.update(deltaTime);
     this.connectParticles(context);
     this.particles.forEach((particle) => {
       particle.draw(context);
@@ -205,9 +216,12 @@ class Effect {
 }
 const effect = new Effect(canvas, ctx);
 
-function animate() {
+let lastTime = 0;
+function animate(timeStamp) {
+    const deltaTime = timeStamp - lastTime;
+    lastTime = timeStamp;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  effect.handleParticles(ctx);
+  effect.handleParticles(ctx, deltaTime);
   requestAnimationFrame(animate);
 }
-animate();
+animate(0);
