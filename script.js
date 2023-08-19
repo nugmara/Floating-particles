@@ -73,9 +73,16 @@ class Whale {
         this.x = this.effect.width * 0.4;
         this.y = this.effect.height * 0.5;
         this.image = document.getElementById("whale1");
+        this.angle = 0;
+        this.va = 0.01;
+        this.curve = this.effect.height * 0.2
     }
     draw(context) {
         context.drawImage(this.image, this.x - this.image.width * 0.5, this.y - this.image.height * 0.5)
+    }
+    update() {
+        this.angle += this.va;
+        this.y = this.effect.height * 0.5 + Math.sin(this.angle) * this.curve;
     }
 }
 
@@ -123,6 +130,7 @@ class Effect {
     }
     handleParticles(context) {
         this.whale.draw(context)
+        this.whale.update()
         this.connectParticles(context)
         this.particles.forEach(particle => {
             particle.draw(context);
@@ -159,6 +167,7 @@ class Effect {
         gradient.addColorStop(0, "#ffef9f");
         this.whale.x = this.width * 0.4
         this.whale.y = this.height * 0.5
+        this.whale.curve = this.effect.height * 0.2;
         this.context.fillStyle = gradient;
         this.context.strokeStyle = "silver";
         this.particles.forEach(particle => {
