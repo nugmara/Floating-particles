@@ -14,10 +14,11 @@ class Particle {
     constructor(effect) {
         this.effect = effect;
         this.radius = Math.floor(Math.random() * 12 + 1);
-        this.x = this.radius + Math.random() * (this.effect.width - this.radius * 2);
+        this.x = this.radius + Math.random() * (this.effect.width + this.effect.maxDistance * 4);
         this.y = this.radius + Math.random() * (this.effect.height - this.radius * 2);
-        this.vx = Math.random() * 1 - 0.5;
-        this.vy = Math.random() * 1 - 0.5;
+        // this.vx = Math.random() * 1 - 0.5;
+        this.vx = -1;
+        // this.vy = Math.random() * 1 - 0.5;
         this.pushX = 0;
         this.pushY = 0;
         this.friction = 0.95;
@@ -40,27 +41,29 @@ class Particle {
             }
         }
         this.x += (this.pushX *= this.friction) + this.vx;
-        this.y += (this.pushY *= this.friction) + this.vy;
+        this.y += (this.pushY *= this.friction)
 
-        if (this.x < this.radius) {
-            this.x = this.radius;
-            this.vx *= -1;
-        } else if (this.x > this.effect.width - this.radius) {
-            this.x = this.effect.width - this.radius;
-            this.vx *= -1
-        }
-        if (this.y < this.radius) {
-            this.y = this.radius;
-            this.vy *= -1;
-        } else if (this.y > this.effect.height - this.radius) {
-            this.y = this.effect.height - this.radius;
-            this.vy *= -1
+        if (this.x < -this.radius - this.effect.maxDistance) {
+            this.x = this.effect.width + this.radius + this.effect.maxDistance;
+            this.y = this.radius + Math.random() * (this.effect.height - this.radius * 2);
+
+            // this.x = this.radius;
+            // this.vx *= -1;
+        // } else if (this.x > this.effect.width - this.radius) {
+        //     this.x = this.effect.width - this.radius;
+        //     this.vx *= -1
+        // }
+        // if (this.y < this.radius) {
+        //     this.y = this.radius;
+        //     this.vy *= -1;
+        // } else if (this.y > this.effect.height - this.radius) {
+        //     this.y = this.effect.height - this.radius;
+        //     this.vy *= -1
         }
     }
     reset() {
-        this.radius = Math.random() * 5 + 2;
-        this.x = this.radius + Math.random() * (this.effect.width - this.radius * 2)
-        this.y = this.radius + Math.random() * (this.effect.height - this.radius * 2)
+        this.x = this.radius + Math.random() * (this.effect.width + this.effect.maxDistance * 4);
+        this.y = this.radius + Math.random() * (this.effect.height - this.radius * 2);
     }
 }
 
@@ -71,7 +74,9 @@ class Effect {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.particles = [];
-        this.numberOfParticles = 600;
+        this.numberOfParticles = 500;
+        this.maxDistance = 100;
+
         this.createParticles()
 
         this.mouse = {
@@ -112,15 +117,14 @@ class Effect {
         })
     }
     connectParticles(context) {
-        const maxDistance = 100;
         for (let a = 0; a < this.particles.length; a++) {
             for (let b = a; b < this.particles.length; b++) {
                 const dx = this.particles[a].x - this.particles[b].x;
                 const dy = this.particles[a].y - this.particles[b].y;
                 const distance = Math.hypot(dx, dy);
-                if (distance < maxDistance) {
+                if (distance < this.maxDistance) {
                     context.save()
-                    const opacity = 1 - (distance/maxDistance)
+                    const opacity = 1 - (distance/this.maxDistance)
                     context.globalAlpha = opacity;
                     context.beginPath()
                     context.moveTo(this.particles[a].x, this.particles[a].y)
