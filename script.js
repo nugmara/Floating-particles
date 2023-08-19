@@ -67,6 +67,18 @@ class Particle {
     }
 }
 
+class Whale {
+    constructor(effect) {
+        this.effect = effect;
+        this.x = this.effect.width * 0.4;
+        this.y = this.effect.height * 0.5;
+        this.image = document.getElementById("whale1");
+    }
+    draw(context) {
+        context.drawImage(this.image, this.x - this.image.width * 0.5, this.y - this.image.height * 0.5)
+    }
+}
+
 class Effect {
     constructor(canvas, context) {
         this.canvas = canvas;
@@ -76,8 +88,8 @@ class Effect {
         this.particles = [];
         this.numberOfParticles = 500;
         this.maxDistance = 100;
-
         this.createParticles()
+        this.whale = new Whale(this)
 
         this.mouse = {
             x: 0,
@@ -110,6 +122,7 @@ class Effect {
         }
     }
     handleParticles(context) {
+        this.whale.draw(context)
         this.connectParticles(context)
         this.particles.forEach(particle => {
             particle.draw(context);
@@ -144,6 +157,8 @@ class Effect {
         gradient.addColorStop(0, "#90f1ef");
         gradient.addColorStop(0, "#ffd6e0");
         gradient.addColorStop(0, "#ffef9f");
+        this.whale.x = this.width * 0.4
+        this.whale.y = this.height * 0.5
         this.context.fillStyle = gradient;
         this.context.strokeStyle = "silver";
         this.particles.forEach(particle => {
